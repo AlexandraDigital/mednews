@@ -1,6 +1,6 @@
 /**
  * Cloudflare Pages Function: /functions/api/news.js
- * 
+ *
  * Deploy this in your project's /functions/api/news.js
  * Set GROQ_API_KEY in Cloudflare Pages → Settings → Environment Variables
  */
@@ -36,23 +36,27 @@ export async function onRequestPost(context) {
     );
   }
 
-  const systemPrompt = `You are a medical technology news analyst. The user wants the latest news on a medical technology topic.
+  const systemPrompt = `You are a senior medical technology analyst with deep knowledge of clinical research, biotech, and health innovation. The user wants an in-depth briefing on a medical technology topic.
 
-Based on your knowledge, respond ONLY with valid JSON (no markdown, no backticks, no extra text) in this exact structure:
+Respond ONLY with valid JSON (no markdown, no backticks, no extra text) in this exact structure:
 {
-  "summary": "A 2-3 paragraph plain-language overview of the latest developments. Written for a general audience — clear, engaging, no jargon.",
+  "summary": "A detailed 4-5 paragraph overview of the current landscape. Cover: what the technology is and how it works, the most significant recent developments, key players (companies, research institutions, clinical trials), real-world impact and patient outcomes where relevant, and what the next 1-2 years might look like. Use clear language accessible to an educated non-specialist — you can use medical/technical terms but briefly explain them. Be specific: cite actual studies, trial phases, approval statuses, statistics, and named organizations where possible.",
   "items": [
     {
-      "headline": "Short punchy headline",
-      "description": "1-2 sentence plain English description of what's happening and why it matters.",
-      "tags": ["tag1", "tag2"],
+      "headline": "Specific, informative headline",
+      "description": "3-4 sentences covering: what exactly happened or was discovered, the methodology or mechanism involved, who conducted it or which organization is behind it, and why it matters clinically or commercially.",
+      "impact": "1-2 sentences on the broader significance — who benefits, what problem it solves, or what barrier it breaks.",
+      "source": "Name of journal, institution, company, or publication (e.g. Nature Medicine, FDA, Mayo Clinic, NEJM, Stanford Medicine)",
+      "sourceType": "One of: journal | institution | company | agency | conference",
+      "url": "A real, specific URL where the user can read more. Use the actual homepage or search page of the source — e.g. https://www.nejm.org, https://www.fda.gov/news-events, https://pubmed.ncbi.nlm.nih.gov/?term=<relevant+search+terms>, https://www.nature.com/nm/, https://clinicaltrials.gov/search?term=<relevant+terms>. Never invent article URLs. Use search or index pages that will actually work.",
+      "tags": ["tag1", "tag2", "tag3"],
       "isHot": true,
       "isNew": false
     }
   ]
 }
 
-Return 4-6 items. Tags should be 1-2 words. isHot = major breakthrough or high impact. isNew = very recent development.`;
+Return 8-10 items. Be specific and factual. Tags should be 1-2 words. isHot = major breakthrough or high clinical/commercial impact. isNew = very recent development.`;
 
   const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -62,11 +66,11 @@ Return 4-6 items. Tags should be 1-2 words. isHot = major breakthrough or high i
     },
     body: JSON.stringify({
       model: "llama-3.3-70b-versatile",
-      max_tokens: 1200,
+      max_tokens: 3000,
       temperature: 0.7,
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `Find the latest news and developments about: ${query}` },
+        { role: "user", content: `Give me an in-depth briefing on the latest developments in: ${query}` },
       ],
     }),
   });
