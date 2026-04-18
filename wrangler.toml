@@ -1,0 +1,9 @@
+name = "medtech-news"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "dist"
+
+[env.production]
+name = "medtech-news"
+
+[env.preview]
+name = "medtech-news-preview"
